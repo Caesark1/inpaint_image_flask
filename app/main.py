@@ -1,12 +1,11 @@
 from PIL import Image
 
-from flask import Flask, render_template, request
+from app import app
 
-import services
-import run_inpaint
+from flask import render_template, request
 
-
-app = Flask(__name__)
+from app import services
+from app import run_inpaint
 
 @app.route("/", methods=('GET', 'POST'))
 def main():
@@ -17,7 +16,3 @@ def main():
         img_tag = services.serve_pil_image(my_image)
         return render_template('base.html', image=img_tag)
     return render_template('base_get.html')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
