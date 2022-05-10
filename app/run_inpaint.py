@@ -61,20 +61,19 @@ def inpaint(prompt: str, image: str):
     #sampling parameters
 
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--prompt", type=str)
-    parser.add_argument("--filename", type=str)
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--prompt", type=str)
+    # parser.add_argument("--filename", type=str)
+    # args = parser.parse_args()
 
     if image == 'first':
-        file_name = 'images/image1.jpeg'
+        file_name = 'images/image.jpg'
     elif image == 'second':
-        file_name = 'images/image2.jpeg'
+        file_name = 'images/image2.jpg'
     elif image == 'third':
-        file_name = 'images/image3.jpeg'
+        file_name = 'images/image3.jpg'
     batch_size = 1
     guidance_scale = 5.0
-
     # Tune this parameter to control the sharpness of 256x256 images.
     # A value of 1.0 is sharper, but sometimes results in grainy artifacts.
     upsample_temp = 0.997
@@ -86,7 +85,8 @@ def inpaint(prompt: str, image: str):
     # The mask should always be a boolean 64x64 mask, and then we
     # can upsample it for the second stage.
     source_mask_64 = th.ones_like(source_image_64)[:, :1]
-    source_mask_64[:, :, 20:] = 0
+    # source_mask_64[:, :, 20:] = 0
+    source_mask_64[:, :, 10:48, 25:38] = 0
     # first image
     # source_mask_64[:, :, 10:25, 30:33] = 0
     # second image
