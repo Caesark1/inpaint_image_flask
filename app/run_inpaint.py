@@ -57,6 +57,13 @@ def inpaint(prompt: str, image: str):
         pil_img = pil_img.resize((size, size), resample=Image.BICUBIC)
         img = np.array(pil_img)
         return th.from_numpy(img)[None].permute(0, 3, 1, 2).float() / 127.5 - 1
+    
+    def save_images(batch: th.Tensor, filename: str):
+        """ save batch of images """
+        scaled = ((batch + 1)*127.5).round().clamp(0,255).to(th.uint8).cpu()
+        reshaped = scaled.permute(2, 0, 3, 1).reshape([batch.shape[2], -1, 3])
+        img = Image.fromarray(reshaped.numpy())
+        img.save(str(filename))
 
     #sampling parameters
 
@@ -72,6 +79,8 @@ def inpaint(prompt: str, image: str):
         file_name = 'images/image2.jpg'
     elif image == 'third':
         file_name = 'images/image3.jpg'
+    elif image == 'fourth':
+        file_name = 'images/audacious.jpg'
     batch_size = 1
     guidance_scale = 5.0
     # Tune this parameter to control the sharpness of 256x256 images.
@@ -85,16 +94,22 @@ def inpaint(prompt: str, image: str):
     # The mask should always be a boolean 64x64 mask, and then we
     # can upsample it for the second stage.
     source_mask_64 = th.ones_like(source_image_64)[:, :1]
-    # source_mask_64[:, :, 20:] = 0
-    source_mask_64[:, :, 10:48, 25:38] = 0
-    # first image
-    # source_mask_64[:, :, 10:25, 30:33] = 0
-    # second image
-    # source_mask_64[:, :, 5:25, 28:33] = 0
-    # source_mask_64[:, :, 18:23, 28:33] = 0
-    # source_mask_64[:, :, 5:10, 28:33] = 0
-    # source_mask_64[:, :, 13:17, 28:33] = 0
+    # red dress
+    if image == 'first':
+        source_mask_64[:, :, 10:48, 25:38] = 0
+    # blue dress
+    elif image == 'second':    
+        source_mask_64[:, :, 5:60, 26:38] = 0
+    # black dress
+    elif image == 'third':
+        source_mask_64[:, :, 10:55, 23:38] = 0
+    elif image == 'fourth':
+        source_mask_64[:, :, 20:] = 0
     source_mask_256 = F.interpolate(source_mask_64, (256, 256), mode='nearest')
+
+    file_name = 'mask_images/fourth_image_mask.jpeg'
+
+    save_images(source_image_256 * source_mask_256, file_name)
 
     ##############################
     # Sample from the base model #
@@ -217,14 +232,9 @@ def inpaint(prompt: str, image: str):
 
     file_name = f"inpaint_images/{str(uuid.uuid4())}.jpeg"
 
-    def save_images(batch: th.Tensor):
-        """ save batch of images """
-        scaled = ((batch + 1)*127.5).round().clamp(0,255).to(th.uint8).cpu()
-        reshaped = scaled.permute(2, 0, 3, 1).reshape([batch.shape[2], -1, 3])
-        img = Image.fromarray(reshaped.numpy())
-        img.save(str(file_name))
+    
 
 
 
-    save_images(up_samples)
+    save_images(up_samples, file_name)
     return file_name

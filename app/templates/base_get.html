@@ -1,11 +1,29 @@
-<form action = "{{ url_for('main') }}" method = "post">
-    <p>Enter Text:</p>
-    <p><input type = "text" name = "text" /></p>
-    <select name="images" id="images">
-        <option value="first">first image</option>
-        <option value="second">second image</option>
-        <option value="third">third image</option>
-      </select>
-    <p><input type = "submit" value = "submit" /></p>
-    {{ url_for('main') }}
-</form>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask app</title>
+    <style>
+      .img-fluid {
+        width: 250px;
+        height: 300px;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <form action = "{{ url_for('main') }}" method = "post" id='image-form'>
+      <p>Enter Text:</p>
+      <p><input type = "text" name = "text" /></p>
+      <p>Please select the image:</p>
+      <input type="radio" id="first" name="images" value="first">
+      <label for="first">{{image1|safe}}</label><label for="first">{{image1_mask|safe}}</label><br>
+      <input type="radio" id="second" name="images" value="second">
+      <label for="second">{{image2|safe}}</label><label for="second">{{image2_mask|safe}}</label><br>
+      <input type="radio" id="third" name="images" value="third">
+      <label for='third'>{{image3|safe}}</label><label for="third">{{image3_mask|safe}}</label><br>
+      <input type="radio" id="fourth" name="images" value="fourth">
+      <label for='fourth'>{{image4|safe}}</label><label for="third">{{image4_mask|safe}}</label>
+      <p><input type = "submit" value = "submit" /></p>
+    </form>
+  </body>
+</html>
